@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libros - Biblioteca </title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+    <nav>
+        <a href="inicio.html">Inicio</a>
+        <a href="libros.html">Libros</a>
+        <a href="#">Préstamos</a>
+        <a href="#">Miembros</a>
+        <a href="#">Reportes</a>
+    </nav>
+</aside>
+<!-- HEADER -->
+<header>
+    <div class="logo">
+        <button id="menuBtn" class="menu-btn">+</button>
+        <a href="index.html" class="logo-link">Biblioteca "Alfonso Reyes"</a>
+    </div>
+
+    <div class="header-right">
+        <a href="#" class="login-link">Administrador</a>
+    </div>
+</header>
+
+<!-- CONTENIDO -->
+<main>
+
+    <h1 class="section-title">Libros Disponibles</h1>
+
+    <!-- BUSCADOR -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Buscar por título...">
+        <button class="btn-primary">Buscar</button>
+    </div>
+
+    <!-- TABLA -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Género</th>
+                    <th>Disponibles</th>
+                </tr>
+            </thead>
+            <tbody id="booksTable">
+                <!-- Los libros se cargan desde el backend -->
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer>
+    © 2026 Biblioteca "Alfonso Reyes"
+</footer>
+
+<!-- MODAL LIBRO -->
+<div id="bookModal" class="modal">
+    <div class="modal-content">
+
+        <span class="close-btn" id="closeModal">&times;</span>
+
+        <div class="modal-body">
+
+            <div class="modal-left">
+                <img id="modalImage" src="IMG/front_house.jpg" alt="Portada">
+            </div>
+
+            <div class="modal-right">
+                <h2 id="modalTitle"></h2>
+                <p><strong>Autor:</strong> <span id="modalAuthor"></span></p>
+                <p><strong>Género:</strong> <span id="modalGenre"></span></p>
+                <p><strong>Disponibilidad:</strong> <span id="modalAvailability"></span></p>
+
+                <button id="loanBtn" class="btn-primary"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/books.js"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Biblioteca "Alfonso Reyes"</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+    <nav>
+        <a href="inicio.html">Inicio</a>
+        <a href="libros.html">Libros</a>
+        <a href="#">Préstamos</a>
+        <a href="#">Miembros</a>
+        <a href="#">Reportes</a>
+    </nav>
+</aside>
+
+<!-- HEADER -->
+<header class="header">
+    <div class="header-content">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <button class="menu-btn" onclick="toggleMenu()">☰</button>
+            <span class="logo">Biblioteca "Alfonso Reyes"</span>
+        </div>
+        <a href="#" class="perfil-icon">👤 Administrador</a>
+    </div>
+</header>
+
+<!-- CONTENIDO PRINCIPAL -->
+<main class="container text-center mt-5">
+
+    <h1 class="titulo-seccion">Panel de Administración</h1>
+
+    <p class="descripcion">
+        Bienvenido al sistema de gestión de la Biblioteca "Alfonso Reyes".
+        Selecciona una opción para continuar.
+    </p>
+
+    <div class="menu-opciones">
+
+        <a href="libros.html" class="card-opcion">
+            📚
+            <h4>Libros</h4>
+        </a>
+
+        <a href="prestamos.html" class="card-opcion">
+            📋
+            <h4>Préstamos</h4>
+        </a>
+
+        <a href="#" class="card-opcion" style="opacity:0.5; cursor:not-allowed;">
+            👥
+            <h4>Miembros</h4>
+        </a>
+
+        <a href="#" class="card-opcion" style="opacity:0.5; cursor:not-allowed;">
+            📊
+            <h4>Reportes</h4>
+        </a>
+
+    </div>
+
+</main>
+
+<footer>© 2026 Biblioteca "Alfonso Reyes"</footer>
+
+<script>
+function toggleMenu() {
+    document.getElementById("sidebar").classList.toggle("active");
+}
+</script>
+
+</body>
+</html>
