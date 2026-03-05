@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Multas | Biblioteca Alfonso Reyes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+    <a href="libros.html">+ Consultar libros</a>
+    <a href="prestamos.html">+ Mis Préstamos</a>
+    <a href="espera.html">+ Mis listas de Espera</a>
+    <a href="multas.html">+ Multas</a>
+</aside>
+
+<!-- HEADER -->
+<header class="header">
+    <div class="header-content">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <button class="menu-btn" onclick="toggleMenu()">☰</button>
+            <span class="logo">Biblioteca "Alfonso Reyes"</span>
+        </div>
+        <a href="usuario/perfil.html" class="perfil-icon">👤</a>
+    </div>
+</header>
+
+<!-- CONTENIDO -->
+<main>
+
+    <h1 class="titulo-seccion">Multas.</h1>
+
+    <div class="table-container" style="margin-top: 20px;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Género</th>
+                    <th>Fecha de Préstamo</th>
+                    <th>Fecha de Devolución</th>
+                    <th>Monto de la multa</th>
+                    <th>Estado del pago</th>
+                </tr>
+            </thead>
+            <tbody id="multasTable">
+                <tr>
+                    <td colspan="7" style="text-align:center; padding: 20px;">
+                        No tienes multas pendientes
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</main>
+
+<footer>© 2026 Biblioteca "Alfonso Reyes"</footer>
+
+<script>
+function toggleMenu() {
+    document.getElementById("sidebar").classList.toggle("active");
+}
+</script>
+
+</body>
+</html>

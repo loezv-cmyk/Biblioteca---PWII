@@ -5,18 +5,85 @@
     <title>Biblioteca "Alfonso Reyes"</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* SIDEBAR CON SUBMENÚS */
+        .sidebar-section {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            padding: 15px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            user-select: none;
+        }
+
+        .sidebar-toggle:hover { background: var(--detalle); }
+
+        .sidebar-toggle .arrow {
+            font-size: 12px;
+            transition: transform 0.3s;
+        }
+
+        .sidebar-toggle.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        .sidebar-submenu {
+            display: none;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .sidebar-submenu.open { display: block; }
+
+        .sidebar-submenu a {
+            padding: 10px 25px 10px 40px;
+            font-size: 14px;
+            color: rgba(255,255,255,0.85);
+        }
+
+        .sidebar-submenu a:hover { background: var(--detalle); }
+    </style>
 </head>
 <body>
 
 <!-- SIDEBAR -->
 <aside id="sidebar" class="sidebar">
-    <nav>
-        <a href="inicio.html">Inicio</a>
-        <a href="libros.html">Libros</a>
-        <a href="#">Préstamos</a>
-        <a href="#">Miembros</a>
-        <a href="#">Reportes</a>
-    </nav>
+
+    <div class="sidebar-section">
+        <div class="sidebar-toggle" onclick="toggleSubmenu('libros-menu', this)">
+            + Libros <span class="arrow">▼</span>
+        </div>
+        <div class="sidebar-submenu" id="libros-menu">
+            <a href="admin/consultar-libros.html">- Consultar Títulos</a>
+            <a href="admin/agregar-libro.html">- Ingresar Título</a>
+        </div>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-toggle" onclick="toggleSubmenu('prestamos-menu', this)">
+            + Préstamos <span class="arrow">▼</span>
+        </div>
+        <div class="sidebar-submenu" id="prestamos-menu">
+            <a href="admin/autorizar-prestamo.html">- Autorizar Préstamo</a>
+            <a href="admin/consultar-prestamos.html">- Consultar Préstamo</a>
+        </div>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-toggle" onclick="toggleSubmenu('miembros-menu', this)">
+            + Miembros <span class="arrow">▼</span>
+        </div>
+        <div class="sidebar-submenu" id="miembros-menu">
+            <a href="#">- Consultar Préstamos y Multas</a>
+        </div>
+    </div>
+
 </aside>
 
 <!-- HEADER -->
@@ -30,7 +97,7 @@
     </div>
 </header>
 
-<!-- CONTENIDO PRINCIPAL -->
+<!-- CONTENIDO -->
 <main class="container text-center mt-5">
 
     <h1 class="titulo-seccion">Panel de Administración</h1>
@@ -42,12 +109,12 @@
 
     <div class="menu-opciones">
 
-        <a href="libros.html" class="card-opcion">
+        <a href="admin/consultar-libros.html" class="card-opcion">
             📚
             <h4>Libros</h4>
         </a>
 
-        <a href="prestamos.html" class="card-opcion">
+        <a href="admin/consultar-prestamos.html" class="card-opcion">
             📋
             <h4>Préstamos</h4>
         </a>
@@ -71,6 +138,12 @@
 <script>
 function toggleMenu() {
     document.getElementById("sidebar").classList.toggle("active");
+}
+
+function toggleSubmenu(id, btn) {
+    const menu = document.getElementById(id);
+    menu.classList.toggle("open");
+    btn.classList.toggle("open");
 }
 </script>
 

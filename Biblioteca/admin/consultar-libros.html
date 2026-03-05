@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Consultar Títulos | Biblioteca Alfonso Reyes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .sidebar-section { border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            padding: 15px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            user-select: none;
+        }
+        .sidebar-toggle:hover { background: var(--detalle); }
+        .sidebar-toggle .arrow { font-size: 12px; transition: transform 0.3s; }
+        .sidebar-toggle.open .arrow { transform: rotate(180deg); }
+        .sidebar-submenu { display: none; background: rgba(0,0,0,0.2); }
+        .sidebar-submenu.open { display: block; }
+        .sidebar-submenu a { padding: 10px 25px 10px 40px; font-size: 14px; color: rgba(255,255,255,0.85); }
+        .sidebar-submenu a:hover { background: var(--detalle); }
+
+        .btn-ver {
+            background: var(--fondo1);
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-right: 4px;
+            transition: background 0.2s;
+        }
+        .btn-editar {
+            background: var(--detalle);
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+        .btn-ver:hover { opacity: 0.8; }
+        .btn-editar:hover { opacity: 0.8; }
+        .btn-agregar {
+            display: inline-block;
+            background: var(--vino);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 15px;
+            margin-bottom: 20px;
+            transition: background 0.2s;
+        }
+        .btn-agregar:hover { background: var(--detalle); color: white; }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-toggle open" onclick="toggleSubmenu('libros-menu', this)">
+            + Libros <span class="arrow" style="transform:rotate(180deg)">▼</span>
+        </div>
+        <div class="sidebar-submenu open" id="libros-menu">
+            <a href="consultar-libros.html">- Consultar Títulos</a>
+            <a href="agregar-libro.html">- Ingresar Título</a>
+        </div>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-toggle" onclick="toggleSubmenu('prestamos-menu', this)">
+            + Préstamos <span class="arrow">▼</span>
+        </div>
+        <div class="sidebar-submenu" id="prestamos-menu">
+            <a href="autorizar-prestamo.html">- Autorizar Préstamo</a>
+            <a href="consultar-prestamos.html">- Consultar Préstamo</a>
+        </div>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-toggle" onclick="toggleSubmenu('miembros-menu', this)">
+            + Miembros <span class="arrow">▼</span>
+        </div>
+        <div class="sidebar-submenu" id="miembros-menu">
+            <a href="#">- Consultar Préstamos y Multas</a>
+        </div>
+    </div>
+</aside>
+
+<!-- HEADER -->
+<header class="header">
+    <div class="header-content">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <button class="menu-btn" onclick="toggleMenu()">☰</button>
+            <span class="logo">Biblioteca "Alfonso Reyes"</span>
+        </div>
+        <a href="#" class="perfil-icon">👤 Administrador</a>
+    </div>
+</header>
+
+<main>
+    <h1 class="titulo-seccion">Consultar Títulos.</h1>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
+        <div class="search-container" style="margin-bottom:0;">
+            <input type="text" id="searchInput" placeholder="Buscar por título...">
+            <button class="btn-primary">Buscar</button>
+        </div>
+        <a href="agregar-libro.html" class="btn-agregar">+ Agregar libro</a>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Género</th>
+                    <th>ISBN</th>
+                    <th># Copias</th>
+                    <th>Disponibles</th>
+                    <th>Préstamos Activos</th>
+                    <th>Lista Espera</th>
+                    <th>Editar</th>
+                </tr>
+            </thead>
+            <tbody id="librosTable">
+                <tr>
+                    <td colspan="9" style="text-align:center; padding:20px;">
+                        No hay libros registrados
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer>© 2026 Biblioteca "Alfonso Reyes"</footer>
+
+<script>
+function toggleMenu() { document.getElementById("sidebar").classList.toggle("active"); }
+function toggleSubmenu(id, btn) {
+    document.getElementById(id).classList.toggle("open");
+    btn.classList.toggle("open");
+}
+</script>
+</body>
+</html>

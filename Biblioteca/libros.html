@@ -3,37 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Libros - Biblioteca </title>
+    <title>Libros - Biblioteca</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
 <!-- SIDEBAR -->
 <aside id="sidebar" class="sidebar">
-    <nav>
-        <a href="inicio.html">Inicio</a>
-        <a href="libros.html">Libros</a>
-        <a href="#">Préstamos</a>
-        <a href="#">Miembros</a>
-        <a href="#">Reportes</a>
-    </nav>
+    <a href="inicio.html">Inicio</a>
+    <a href="libros.html">Libros</a>
+    <a href="#">Préstamos</a>
+    <a href="#">Miembros</a>
+    <a href="#">Reportes</a>
 </aside>
-<!-- HEADER -->
-<header>
-    <div class="logo">
-        <button id="menuBtn" class="menu-btn">+</button>
-        <a href="index.html" class="logo-link">Biblioteca "Alfonso Reyes"</a>
-    </div>
 
-    <div class="header-right">
-        <a href="#" class="login-link">Administrador</a>
+<!-- HEADER -->
+<header class="header">
+    <div class="header-content">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <button class="menu-btn" onclick="toggleMenu()">☰</button>
+            <span class="logo">Biblioteca "Alfonso Reyes"</span>
+        </div>
+        <a href="#" class="perfil-icon">👤 Administrador</a>
     </div>
 </header>
 
 <!-- CONTENIDO -->
 <main>
 
-    <h1 class="section-title">Libros Disponibles</h1>
+    <h1 class="titulo-seccion">Libros Disponibles</h1>
 
     <!-- BUSCADOR -->
     <div class="search-container">
@@ -59,9 +57,7 @@
     </div>
 </main>
 
-<footer>
-    © 2026 Biblioteca "Alfonso Reyes"
-</footer>
+<footer>© 2026 Biblioteca "Alfonso Reyes"</footer>
 
 <!-- MODAL LIBRO -->
 <div id="bookModal" class="modal">
@@ -80,7 +76,6 @@
                 <p><strong>Autor:</strong> <span id="modalAuthor"></span></p>
                 <p><strong>Género:</strong> <span id="modalGenre"></span></p>
                 <p><strong>Disponibilidad:</strong> <span id="modalAvailability"></span></p>
-
                 <button id="loanBtn" class="btn-primary"></button>
             </div>
         </div>
@@ -88,5 +83,11 @@
 </div>
 
 <script src="js/books.js"></script>
+<script>
+function toggleMenu() {
+    document.getElementById("sidebar").classList.toggle("active");
+}
+</script>
+
 </body>
 </html>

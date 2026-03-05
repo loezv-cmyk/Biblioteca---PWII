@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Mi Perfil | Biblioteca Alfonso Reyes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../css/styles.css">
+<style>
+    .perfil-card {
+        background: rgba(255,255,255,0.85);
+        backdrop-filter: blur(6px);
+        border-radius: 15px;
+        padding: 40px;
+        max-width: 700px;
+        margin: 0 auto 40px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+    }
+
+    .perfil-nombre {
+        font-family: 'Playfair Display', serif;
+        font-size: 36px;
+        color: var(--vino);
+        margin-bottom: 5px;
+    }
+
+    .perfil-detalle {
+        color: var(--detalle);
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .btn-editar {
+        display: inline-block;
+        background: var(--vino);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        margin-top: 15px;
+        transition: background 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-editar:hover { background: var(--detalle); color: white; }
+
+    .perfil-opciones {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+
+    .card-opcion-perfil {
+        background: rgba(255,255,255,0.85);
+        backdrop-filter: blur(6px);
+        width: 200px;
+        height: 140px;
+        border-radius: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
+        color: var(--vino);
+        font-family: 'Playfair Display', serif;
+        font-size: 16px;
+        font-weight: 700;
+        text-align: center;
+        padding: 20px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+        transition: transform 0.3s;
+    }
+
+    .card-opcion-perfil:hover { transform: translateY(-6px); color: var(--detalle); }
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+    <a href="../libros.html">+ Consultar libros</a>
+    <a href="../prestamos.html">+ Mis Préstamos</a>
+    <a href="../espera.html">+ Mis listas de Espera</a>
+    <a href="../multas.html">+ Multas</a>
+</aside>
+
+<!-- HEADER -->
+<header class="header">
+    <div class="header-content">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <button class="menu-btn" onclick="toggleMenu()">☰</button>
+            <span class="logo">Biblioteca "Alfonso Reyes"</span>
+        </div>
+        <a href="perfil.html" class="perfil-icon">👤</a>
+    </div>
+</header>
+
+<!-- CONTENIDO -->
+<main>
+
+    <div class="perfil-card">
+        <h1 class="perfil-nombre" id="perfilNombre">Cargando...</h1>
+        <p class="perfil-detalle" id="perfilEmail"></p>
+        <p class="perfil-detalle" id="perfilMiembro"></p>
+        <button class="btn-editar">Editar información de contacto</button>
+    </div>
+
+    <div class="perfil-opciones">
+        <a href="../prestamos.html" class="card-opcion-perfil">Mis Préstamos</a>
+        <a href="../espera.html" class="card-opcion-perfil">Mis Listas de Espera</a>
+        <a href="../multas.html" class="card-opcion-perfil">Consultar / Pagar Multas</a>
+    </div>
+
+</main>
+
+<footer>© 2026 Biblioteca "Alfonso Reyes"</footer>
+
+<script>
+function toggleMenu() {
+    document.getElementById("sidebar").classList.toggle("active");
+}
+
+// Cargar datos del usuario desde localStorage
+const user = JSON.parse(localStorage.getItem("user"));
+if (user) {
+    document.getElementById("perfilNombre").textContent = user.name;
+    document.getElementById("perfilEmail").textContent = "Contacto: " + user.email;
+    document.getElementById("perfilMiembro").textContent = "Rol: " + (user.role === "ADMIN" ? "Administrador" : "Miembro");
+} else {
+    window.location.href = "../login.html";
+}
+</script>
+
+</body>
+</html>
