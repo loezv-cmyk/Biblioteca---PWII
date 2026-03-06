@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model book {
+  id        Int        @id @default(autoincrement())
+  title     String
+  author    String
+  isbn      String?    @unique(map: "Book_isbn_key")
+  stock     Int        @default(1)
+  createdAt DateTime   @default(now())
+  loanitem  loanitem[]
+}
+
+model loan {
+  id         Int        @id @default(autoincrement())
+  userId     Int
+  status     String     @default("ACTIVE")
+  loanDate   DateTime   @default(now())
+  returnDate DateTime?
+  user       user       @relation(fields: [userId], references: [id], map: "Loan_userId_fkey")
+  loanitem   loanitem[]
+
+  @@index([userId], map: "Loan_userId_fkey")
+}
+
+model loanitem {
+  id     Int  @id @default(autoincrement())
+  loanId Int
+  bookId Int
+  qty    Int  @default(1)
+  book   book @relation(fields: [bookId], references: [id], map: "LoanItem_bookId_fkey")
+  loan   loan @relation(fields: [loanId], references: [id], map: "LoanItem_loanId_fkey")
+
+  @@index([bookId], map: "LoanItem_bookId_fkey")
+  @@index([loanId], map: "LoanItem_loanId_fkey")
+}
+
+model log {
+  id        Int      @id @default(autoincrement())
+  level     String
+  message   String
+  meta      Json?
+  createdAt DateTime @default(now())
+}
+
+model user {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique(map: "User_email_key")
+  password  String
+  role      String   @default("USER")
+  createdAt DateTime @default(now())
+  loan      loan[]
+}
