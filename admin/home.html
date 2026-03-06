@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Administrador</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+
+<body>
+    <header class="header">
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
+        <div class="logo">Biblioteca “Alfonso Reyes”</div>
+        <div class="user-icon">
+            <img src="../img/icono-usuario.png" alt="usuario">
+        </div>
+    </header>
+    
+    <div id="sidebar" class="sidebar">
+        <ul>
+            <li class="menu-section">Libros</li>
+            <li><a href="consultar_titulo.html">Consultar títulos</a></li>
+            <li><a href="registrar_libro.html">Ingresar título</a></li>
+            <li class="menu-section">Préstamos</li>
+            <li><a href="#">Autorizar préstamo</a></li>
+            <li class="menu-section">Miembros</li>
+            <li><a href="#">Consultar préstamos y multas</a></li>
+        </ul>
+    </div>
+    
+    <main class="contenido">
+        <h1>Panel de administrador</h1>
+        <p>
+            Bienvenido al sistema administrativo de la Biblioteca Alfonso Reyes.
+            Desde este panel puedes administrar libros, préstamos y miembros.
+        </p>
+    </main>
+    
+    <script src="../js/admin_menu.js"></script>
+</body>
+</html>

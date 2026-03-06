@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Consultar títulos</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+
+<body>
+    <header class="header">
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
+        <div class="logo">
+            <a href="home.html">Biblioteca “Alfonso Reyes”</a>
+        </div>
+        <div class="user-icon">
+            <img src="../img/icono-usuario.png" alt="usuario">
+        </div>
+    </header>
+    
+    <div id="sidebar" class="sidebar">
+        <ul>
+            <li class="menu-section">Libros</li>
+            <li><a href="consultar_titulo.html">Consultar títulos</a></li>
+            <li><a href="registrar_libro.html">Ingresar título</a></li>
+            <li class="menu-section">Préstamos</li>
+            <li><a href="#">Autorizar préstamo</a></li>
+            <li class="menu-section">Miembros</li>
+            <li><a href="#">Consultar préstamos y multas</a></li>
+        </ul>
+    </div>
+    
+    <div class="contenido">
+        <h1>Consultar títulos</h1>
+        <div class="busqueda">
+            <input type="text" id="buscarTitulo" placeholder="Buscar por título...">
+            <button onclick="buscarLibro()">Buscar</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Género</th>
+                    <th>ISBN</th>
+                    <th># Copias</th>
+                    <th>Disponibles</th>
+                    <th>Préstamos</th>
+                    <th>Lista espera</th>
+                    <th>Editar</th>
+                </tr>
+            </thead>
+            <tbody id="tablaLibros">
+
+            </tbody>
+        </table>
+    </div>
+    <script src="../js/consultar_titulos.js"></script>
+</body>
+</html>

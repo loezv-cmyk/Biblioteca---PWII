@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar Libro</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+
+<body>
+    <header class="header">
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
+        <div class="logo">
+            <a href="home.html">Biblioteca “Alfonso Reyes”</a>
+        </div>
+        <div class="user-icon">
+            <img src="../img/icono-usuario.png" alt="usuario">
+        </div>
+    </header>
+    
+    <div id="sidebar" class="sidebar">
+        <ul>
+            <li class="menu-section">Libros</li>
+            <li><a href="consultar_titulo.html">Consultar títulos</a></li>
+            <li><a href="registrar_libro.html">Ingresar título</a></li>
+            <li class="menu-section">Préstamos</li>
+            <li><a href="#">Autorizar préstamo</a></li>
+            <li class="menu-section">Miembros</li>
+            <li><a href="#">Consultar préstamos y multas</a></li>
+        </ul>
+    </div>
+    
+    <div class="form-container">
+        <h1>Ingresar nuevo título</h1>
+        <form id="formLibro">
+
+<input type="text" id="titulo" placeholder="Título" required>
+
+<input type="text" id="autor" placeholder="Autor" required>
+
+<input type="text" id="genero" placeholder="Género" required>
+
+<input type="text" id="isbn" placeholder="ISBN" required>
+
+<input type="number" id="cantidad" placeholder="Cantidad de copias" required>
+
+<button type="submit">Registrar libro</button>
+
+</form>
+
+</div>
+
+<script src="../js/admin_menu.js"></script>
+<script src="../js/registrar_libro.js"></script>
+
+</body>
+
+</html>

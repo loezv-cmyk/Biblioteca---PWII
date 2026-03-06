@@ -1,0 +1,149 @@
+body{
+    margin:0;
+    font-family: Georgia, serif;
+    min-height:100vh;
+    background: linear-gradient(
+        180deg,
+        #3e8792 0%,
+        #8fa0b8 100%
+        );
+    background-attachment: fixed;
+}
+
+/* HEADER */
+
+.header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:#6b0d2e;
+    color:white;
+    padding:15px 30px;
+}
+
+.logo{
+    font-size:32px;
+}
+
+.logo a{
+    color:white;
+    text-decoration:none;
+}
+
+.menu-icon{
+    font-size:25px;
+    cursor:pointer;
+}
+
+.user-icon img{
+    width:40px;
+}
+
+
+/* SIDEBAR */
+
+.sidebar{
+    position:fixed;
+    top:0;
+    left:-250px;
+    width:250px;
+    height:100%;
+    background:#6b0d2e;
+    padding-top:80px;
+    transition:0.3s;
+}
+
+.sidebar ul{
+    list-style:none;
+    padding:0;
+}
+
+.sidebar li{
+    padding:12px 20px;
+}
+
+.sidebar a{
+    color:white;
+    text-decoration:none;
+}
+
+.menu-section{
+    color:#ddd;
+    font-weight:bold;
+}
+
+
+/* CONTENIDO */
+
+.contenido{
+    padding:60px;
+}
+
+.contenido h1{
+    color:#245660;
+}
+
+
+/* FORMULARIO */
+
+.form-container{
+    width:400px;
+    margin:80px auto;
+    background:white;
+    padding:30px;
+    border-radius:10px;
+    text-align:center;
+}
+
+.form-container input{
+    width:100%;
+    margin:10px 0;
+    padding:10px;
+    border-radius:5px;
+    border:1px solid #ccc;
+}
+
+.form-container button{
+    width:100%;
+    padding:10px;
+    background:#245660;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.form-container h1{
+    color: #245660;
+}
+
+
+/* TABLA */
+
+table{
+    width:90%;
+    margin:40px auto;
+    border-collapse:collapse;
+    background:white;
+}
+
+thead{
+    background:#6b0d2e;
+    color:white;
+
+}
+
+th, td{
+    padding:10px;
+    border:1px solid #ddd;
+    text-align:center;
+}
+
+button{
+    padding:6px 12px;
+    border:none;
+    background:#3e8792;
+    color:white;
+    border-radius:5px;
+    cursor:pointer;
+}
