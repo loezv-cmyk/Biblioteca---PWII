@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libros - Biblioteca "Alfonso Reyes"</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/app.css">
+    <style>
+        .book-row { cursor: pointer; transition: background 0.2s; }
+        .book-row:hover { background: rgba(0,0,0,0.03); }
+        .status-msg { padding: 12px; text-align: center; color: #666; }
+        .status-msg.error { color: #c0392b; }
+    </style>
+</head>
+<body class="has-app-nav">
+
+<!-- Protección -->
+<script src="js/session.js"></script>
+<script> requireAuth(); </script>
+
+<!-- NAVEGACIÓN -->
+<div id="app-nav" data-page="libros"></div>
+
+<!-- CONTENIDO -->
+<main>
+    <h1 class="titulo-seccion">Consultar Libros</h1>
+
+    <!-- BUSCADOR -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Buscar por título, autor o género...">
+        <button class="btn-primary" id="searchBtn">Buscar</button>
+    </div>
+
+    <!-- TABLA -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Género</th>
+                    <th>Disponibles</th>
+                </tr>
+            </thead>
+            <tbody id="booksTable">
+                <tr><td colspan="4" class="status-msg">Cargando libros...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer>© 2026 Biblioteca "Alfonso Reyes"</footer>
+
+<!-- MODAL -->
+<div id="bookModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" id="closeModal">&times;</span>
+
+        <div class="modal-body">
+            <div class="modal-left">
+                <img id="modalImage" src="IMG/front_house.jpg" alt="Portada">
+            </div>
+
+            <div class="modal-right">
+                <h2 id="modalTitle"></h2>
+                <p><strong>Autor:</strong> <span id="modalAuthor"></span></p>
+                <p><strong>Género:</strong> <span id="modalGenre"></span></p>
+                <p><strong>ISBN:</strong> <span id="modalIsbn"></span></p>
+                <p><strong>Disponibilidad:</strong> <span id="modalAvailability"></span></p>
+                <button id="loanBtn" class="btn-primary"></button>
+                <p id="loanFeedback" style="margin-top:10px; font-size:14px;"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/nav.js"></script>
+<script src="js/books.js"></script>
+
+</body>
+</html>

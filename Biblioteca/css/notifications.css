@@ -1,0 +1,442 @@
+/* ============================================
+   notifications.css — Sistema de notificaciones
+   Se integra en el topbar del layout.
+   ============================================ */
+
+/* ===== TOPBAR: contenedor de la campana ===== */
+.topbar-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ===== BOTÓN CAMPANA ===== */
+.notif-bell {
+    position: relative;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background 0.2s, transform 0.2s;
+    line-height: 1;
+}
+
+.notif-bell:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Animación de la campana cuando hay notificaciones nuevas */
+.notif-bell.has-new {
+    animation: bell-ring 1.5s ease-in-out;
+    animation-iteration-count: 2;
+}
+
+@keyframes bell-ring {
+    0%, 100% { transform: rotate(0); }
+    10%, 30%, 50% { transform: rotate(-12deg); }
+    20%, 40%, 60% { transform: rotate(12deg); }
+    70% { transform: rotate(0); }
+}
+
+/* Badge contador rojo */
+.notif-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: #e24b4a;
+    color: white;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Libre Baskerville', serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(226, 75, 74, 0.5);
+    animation: badge-pop 0.4s ease-out;
+}
+
+.notif-badge.hidden {
+    display: none;
+}
+
+@keyframes badge-pop {
+    0% { transform: scale(0); }
+    60% { transform: scale(1.25); }
+    100% { transform: scale(1); }
+}
+
+/* Pulso sutil continuo cuando hay pendientes */
+.notif-badge.pulsing {
+    animation: badge-pulse 2s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+    0%, 100% {
+        box-shadow: 0 2px 6px rgba(226, 75, 74, 0.5);
+    }
+    50% {
+        box-shadow: 0 2px 6px rgba(226, 75, 74, 0.5),
+                    0 0 0 6px rgba(226, 75, 74, 0.15);
+    }
+}
+
+/* ===== PANEL DESPLEGABLE ===== */
+.notif-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 16px;
+    width: 360px;
+    max-width: calc(100vw - 32px);
+    max-height: 480px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    z-index: 1100;
+
+    /* Animación de entrada */
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.notif-panel.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.notif-panel-header {
+    background: var(--primary);
+    color: white;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+}
+
+.notif-mark-read {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+    font-size: 12px;
+    font-family: 'Libre Baskerville', serif;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.notif-mark-read:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+.notif-mark-read:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ===== LISTA ===== */
+.notif-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+.notif-loading,
+.notif-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: #888;
+    font-size: 14px;
+    font-style: italic;
+}
+
+.notif-empty-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+    opacity: 0.4;
+}
+
+/* ===== ITEM INDIVIDUAL ===== */
+.notif-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+
+    /* Animación de entrada en cascada */
+    opacity: 0;
+    transform: translateX(-10px);
+    animation: notif-slide-in 0.3s ease forwards;
+}
+
+.notif-item:nth-child(1) { animation-delay: 0.05s; }
+.notif-item:nth-child(2) { animation-delay: 0.1s; }
+.notif-item:nth-child(3) { animation-delay: 0.15s; }
+.notif-item:nth-child(4) { animation-delay: 0.2s; }
+.notif-item:nth-child(5) { animation-delay: 0.25s; }
+.notif-item:nth-child(n+6) { animation-delay: 0.3s; }
+
+@keyframes notif-slide-in {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.notif-item:last-child { border-bottom: none; }
+
+.notif-item:hover {
+    background: #f5f7fa;
+}
+
+/* Marcar como no leída (fondo suave) */
+.notif-item.unread {
+    background: rgba(62, 135, 146, 0.06);
+}
+
+.notif-item.unread:hover {
+    background: rgba(62, 135, 146, 0.12);
+}
+
+/* Punto azul de "no leída" */
+.notif-item.unread::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--secondary);
+    margin-top: 7px;
+    margin-left: -14px;
+    animation: dot-blink 2s ease-in-out infinite;
+}
+
+@keyframes dot-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.notif-item {
+    position: relative;
+    padding-left: 24px;
+}
+
+/* ===== ICONO POR TIPO ===== */
+.notif-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.notif-icon.success {
+    background: #e1f5ee;
+    color: #0f6e56;
+}
+
+.notif-icon.warning {
+    background: #faeeda;
+    color: #854f0b;
+}
+
+.notif-icon.danger {
+    background: #fcebeb;
+    color: #a32d2d;
+}
+
+.notif-icon.info {
+    background: #e6f1fb;
+    color: #0c447c;
+}
+
+/* ===== CONTENIDO DEL ITEM ===== */
+.notif-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.notif-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--texto);
+    margin-bottom: 3px;
+    line-height: 1.3;
+}
+
+.notif-text {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.4;
+    margin-bottom: 5px;
+}
+
+.notif-time {
+    font-size: 11px;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ===== FOOTER DEL PANEL ===== */
+.notif-panel-footer {
+    border-top: 1px solid #eee;
+    padding: 10px;
+    text-align: center;
+    background: #fafbfc;
+}
+
+.notif-panel-footer a {
+    color: var(--secondary);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.notif-panel-footer a:hover {
+    text-decoration: underline;
+}
+
+/* ===== TOAST (aparece arriba a la derecha cuando llega una nueva) ===== */
+.notif-toast-container {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.notif-toast {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    padding: 14px 16px;
+    width: 320px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    pointer-events: auto;
+    border-left: 4px solid var(--secondary);
+
+    /* Entrada deslizando desde la derecha */
+    animation: toast-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.notif-toast.leaving {
+    animation: toast-out 0.3s ease-in forwards;
+}
+
+.notif-toast.success { border-left-color: #0f6e56; }
+.notif-toast.warning { border-left-color: #854f0b; }
+.notif-toast.danger  { border-left-color: #a32d2d; }
+.notif-toast.info    { border-left-color: #0c447c; }
+
+@keyframes toast-in {
+    0% {
+        opacity: 0;
+        transform: translateX(400px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes toast-out {
+    0% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(400px);
+    }
+}
+
+.notif-toast-close {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    margin-left: auto;
+}
+
+.notif-toast-close:hover { color: #333; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+    .notif-panel {
+        right: 8px;
+        left: 8px;
+        width: auto;
+    }
+
+    .notif-toast {
+        width: calc(100vw - 40px);
+    }
+
+    .notif-toast-container {
+        top: 70px;
+        right: 10px;
+        left: 10px;
+    }
+}
+
+/* ===== MOSTRAR TOPBAR TAMBIÉN EN DESKTOP =====
+   El topbar original solo aparecía en móvil. Para que la campana
+   sea visible siempre, lo mostramos también en desktop cuando hay
+   acciones (la campana). El sidebar lateral sigue siendo el menú principal. */
+@media (min-width: 901px) {
+    .app-topbar.has-notifications {
+        display: flex;
+        justify-content: flex-end;
+        background: transparent;
+        height: auto;
+        padding: 12px 24px 0;
+        position: sticky;
+        top: 0;
+    }
+
+    .app-topbar.has-notifications .topbar-toggle,
+    .app-topbar.has-notifications .topbar-title {
+        display: none;
+    }
+
+    .app-topbar.has-notifications .notif-bell {
+        background: var(--primary);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .app-topbar.has-notifications .notif-bell:hover {
+        background: var(--accent);
+    }
+}

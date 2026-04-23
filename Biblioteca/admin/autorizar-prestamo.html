@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Autorizar Préstamo | Biblioteca "Alfonso Reyes"</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/app.css">
+    <style>
+        .btn-autorizar {
+            background: #2e7d32; color: white; border: none;
+            padding: 5px 12px; border-radius: 6px; cursor: pointer;
+            font-size: 13px; margin-right: 4px; transition: opacity 0.2s;
+        }
+        .btn-rechazar {
+            background: #c62828; color: white; border: none;
+            padding: 5px 12px; border-radius: 6px; cursor: pointer;
+            font-size: 13px; transition: opacity 0.2s;
+        }
+        .btn-autorizar:hover, .btn-rechazar:hover { opacity: 0.85; }
+    </style>
+</head>
+<body class="has-app-nav">
+
+<script src="../js/session.js"></script>
+<script> requireAdmin(); </script>
+
+<div id="app-nav" data-page="admin-autorizar"></div>
+
+<main>
+    <h1 class="titulo-seccion">Autorizar Préstamos</h1>
+    <p class="descripcion">Revisa y autoriza las solicitudes de préstamo pendientes.</p>
+
+    <div class="search-container" style="margin-bottom:20px;">
+        <input type="text" id="searchInput" placeholder="Buscar por miembro o título...">
+        <button class="btn-primary">Buscar</button>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Miembro</th>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Fecha Solicitud</th>
+                    <th>Autorizar</th>
+                    <th>Rechazar</th>
+                </tr>
+            </thead>
+            <tbody id="solicitudesTable">
+                <tr>
+                    <td colspan="6" style="text-align:center; padding:20px; color:#666;">
+                        Próximamente — aún no implementado
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer>© 2026 Biblioteca "Alfonso Reyes"</footer>
+<script src="../js/nav.js"></script>
+</body>
+</html>

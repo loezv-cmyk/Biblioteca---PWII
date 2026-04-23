@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model book {
+  id        Int        @id @default(autoincrement())
+  title     String
+  author    String
+  genre     String?
+  isbn      String?    @unique(map: "Book_isbn_key")
+  stock     Int        @default(1)
+  createdAt DateTime   @default(now())
+  loanitem  loanitem[]
+  hold      hold[]
+}
+
+model loan {
+  id         Int        @id @default(autoincrement())
+  userId     Int
+  status     String     @default("ACTIVE") // ACTIVE | RETURNED | OVERDUE
+  loanDate   DateTime   @default(now())
+  dueDate    DateTime?
+  returnDate DateTime?
+  user       user       @relation(fields: [userId], references: [id], map: "Loan_userId_fkey")
+  loanitem   loanitem[]
+  fine       fine[]
+
+  @@index([userId], map: "Loan_userId_fkey")
+}
+
+model loanitem {
+  id     Int  @id @default(autoincrement())
+  loanId Int
+  bookId Int
+  qty    Int  @default(1)
+  book   book @relation(fields: [bookId], references: [id], map: "LoanItem_bookId_fkey")
+  loan   loan @relation(fields: [loanId], references: [id], map: "LoanItem_loanId_fkey")
+
+  @@index([bookId], map: "LoanItem_bookId_fkey")
+  @@index([loanId], map: "LoanItem_loanId_fkey")
+}
+
+model hold {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  bookId    Int
+  position  Int      // posición en la fila
+  status    String   @default("WAITING") // WAITING | NOTIFIED | CANCELLED | FULFILLED
+  createdAt DateTime @default(now())
+  user      user     @relation(fields: [userId], references: [id], map: "Hold_userId_fkey")
+  book      book     @relation(fields: [bookId], references: [id], map: "Hold_bookId_fkey")
+
+  @@index([userId], map: "Hold_userId_fkey")
+  @@index([bookId], map: "Hold_bookId_fkey")
+}
+
+model fine {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  loanId    Int
+  amount    Float
+  reason    String
+  status    String   @default("PENDING") // PENDING | PAID
+  createdAt DateTime @default(now())
+  paidAt    DateTime?
+  user      user     @relation(fields: [userId], references: [id], map: "Fine_userId_fkey")
+  loan      loan     @relation(fields: [loanId], references: [id], map: "Fine_loanId_fkey")
+
+  @@index([userId], map: "Fine_userId_fkey")
+  @@index([loanId], map: "Fine_loanId_fkey")
+}
+
+model log {
+  id        Int      @id @default(autoincrement())
+  level     String
+  message   String
+  meta      Json?
+  createdAt DateTime @default(now())
+}
+
+model user {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique(map: "User_email_key")
+  password  String
+  role      String   @default("USER") // USER | ADMIN
+  phone     String?
+  createdAt DateTime @default(now())
+  loan      loan[]
+  hold      hold[]
+  fine      fine[]
+}

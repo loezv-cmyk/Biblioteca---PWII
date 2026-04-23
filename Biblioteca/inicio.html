@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio - Biblioteca "Alfonso Reyes"</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="has-app-nav">
+
+<!-- Protección -->
+<script src="js/session.js"></script>
+<script> requireAuth(); </script>
+
+<!-- NAVEGACIÓN (sidebar + topbar) - se pinta sola -->
+<div id="app-nav" data-page="inicio"></div>
+
+<!-- CONTENIDO -->
+<main class="container text-center mt-5">
+
+    <h1 class="titulo-seccion" id="tituloBienvenida">Bienvenido/a</h1>
+
+    <p class="descripcion" id="descripcion">
+        Selecciona una opción para continuar.
+    </p>
+
+    <div class="menu-opciones" id="menuOpciones">
+
+        <a href="libros.html" class="card-opcion">
+            📚 <h4>Libros</h4>
+        </a>
+
+        <a href="prestamos.html" class="card-opcion">
+            📋 <h4>Mis Préstamos</h4>
+        </a>
+
+        <a href="espera.html" class="card-opcion">
+            ⏳ <h4>Listas de Espera</h4>
+        </a>
+
+        <a href="multas.html" class="card-opcion">
+            💰 <h4>Multas</h4>
+        </a>
+
+        <!-- Solo admin -->
+        <a href="admin/consultar-libros.html" class="card-opcion admin-card" style="display:none;">
+            🛠️ <h4>Gestión de Libros</h4>
+        </a>
+        <a href="admin/consultar-prestamos.html" class="card-opcion admin-card" style="display:none;">
+            📊 <h4>Gestión de Préstamos</h4>
+        </a>
+        <a href="admin/reportes.html" class="card-opcion admin-card" style="display:none;">
+            📈 <h4>Reportes</h4>
+        </a>
+
+    </div>
+
+</main>
+
+<footer>© 2026 Biblioteca "Alfonso Reyes"</footer>
+
+<script src="js/nav.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const user = getUser();
+    if (!user) return;
+
+    document.getElementById("tituloBienvenida").textContent = `Bienvenido/a, ${user.name}`;
+
+    if (user.role === "ADMIN") {
+        document.getElementById("descripcion").textContent =
+            "Panel de administración de la Biblioteca \"Alfonso Reyes\".";
+        document.querySelectorAll(".admin-card").forEach(el => el.style.display = "");
+    }
+});
+</script>
+
+</body>
+</html>

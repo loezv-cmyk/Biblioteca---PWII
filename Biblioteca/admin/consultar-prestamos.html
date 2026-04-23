@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Préstamos | Biblioteca "Alfonso Reyes"</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+<body class="has-app-nav">
+
+<script src="../js/session.js"></script>
+<script> requireAdmin(); </script>
+
+<div id="app-nav" data-page="admin-prestamos"></div>
+
+<main>
+    <h1 class="titulo-seccion">Gestión de Préstamos</h1>
+    <p class="descripcion">Administra todos los préstamos registrados en el sistema.</p>
+
+    <div class="search-container" style="margin-bottom:20px;">
+        <input type="text" id="searchInput" placeholder="Buscar por miembro o título...">
+        <button class="btn-primary">Buscar</button>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Miembro</th>
+                    <th>Libros</th>
+                    <th>Fecha de Préstamo</th>
+                    <th>Fecha de Devolución</th>
+                    <th>Estatus</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="prestamosTable">
+                <tr>
+                    <td colspan="7" style="text-align:center; padding:20px; color:#666;">
+                        Próximamente — aún no implementado
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer>© 2026 Biblioteca "Alfonso Reyes"</footer>
+<script src="../js/nav.js"></script>
+</body>
+</html>

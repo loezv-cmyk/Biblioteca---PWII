@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Libro | Biblioteca "Alfonso Reyes"</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/app.css">
+    <style>
+        .form-libro {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(6px);
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+        }
+        .form-libro label {
+            display: block; margin-top: 15px; margin-bottom: 5px;
+            font-size: 14px; color: var(--texto);
+        }
+        .form-libro input {
+            width: 100%; padding: 10px; border-radius: 8px;
+            border: 1px solid #ccc; outline: none; font-size: 14px;
+            transition: border 0.2s;
+        }
+        .form-libro input:focus { border-color: var(--detalle); }
+        .btn-guardar {
+            width: 100%; margin-top: 25px; padding: 12px;
+            background: var(--vino); color: white; border: none;
+            border-radius: 8px; font-size: 16px; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-guardar:hover { background: var(--detalle); }
+        .btn-guardar:disabled { opacity: 0.6; cursor: not-allowed; }
+        .form-feedback {
+            margin-top: 15px; text-align: center; font-size: 14px;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body class="has-app-nav">
+
+<script src="../js/session.js"></script>
+<script> requireAdmin(); </script>
+
+<div id="app-nav" data-page="admin-nuevo"></div>
+
+<main>
+    <h1 class="titulo-seccion">Agregar Libro</h1>
+
+    <form class="form-libro" id="formLibro">
+        <label>Título</label>
+        <input type="text" id="titulo" placeholder="Título del libro" required>
+
+        <label>Autor</label>
+        <input type="text" id="autor" placeholder="Nombre del autor" required>
+
+        <label>Género</label>
+        <input type="text" id="genero" placeholder="Ej. Novela, Fábula, Distopía...">
+
+        <label>ISBN</label>
+        <input type="text" id="isbn" placeholder="Ej. 9783140464079">
+
+        <label>Número de copias</label>
+        <input type="number" id="copias" placeholder="Ej. 5" min="1" value="1" required>
+
+        <button type="submit" class="btn-guardar" id="btnGuardar">Guardar libro</button>
+        <p id="feedback" class="form-feedback"></p>
+    </form>
+</main>
+
+<footer>© 2026 Biblioteca "Alfonso Reyes"</footer>
+
+<script src="../js/nav.js"></script>
+<script>
+document.getElementById("formLibro").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const btn = document.getElementById("btnGuardar");
+    const feedback = document.getElementById("feedback");
+
+    const data = {
+        title:  document.getElementById("titulo").value.trim(),
+        author: document.getElementById("autor").value.trim(),
+        genre:  document.getElementById("genero").value.trim() || undefined,
+        isbn:   document.getElementById("isbn").value.trim() || undefined,
+        stock:  parseInt(document.getElementById("copias").value, 10),
+    };
+
+    btn.disabled = true;
+    btn.textContent = "Guardando...";
+    feedback.style.color = "#555";
+    feedback.textContent = "";
+
+    try {
+        const book = await apiFetch("/books", { method: "POST", body: data });
+        feedback.style.color = "green";
+        feedback.textContent = `✅ Libro "${book.title}" agregado correctamente.`;
+        document.getElementById("formLibro").reset();
+        document.getElementById("copias").value = 1;
+    } catch (err) {
+        feedback.style.color = "#c0392b";
+        feedback.textContent = err.message;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = "Guardar libro";
+    }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Préstamos - Biblioteca "Alfonso Reyes"</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/app.css">
+    <style>
+        /* Filtros de estado */
+        .filters {
+            display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .filter-btn {
+            background: rgba(255,255,255,0.85); color: var(--vino);
+            border: none; padding: 8px 18px; border-radius: 20px;
+            cursor: pointer; font-size: 14px;
+            font-family: 'Libre Baskerville', serif;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover { background: white; }
+        .filter-btn.active {
+            background: var(--vino); color: white;
+        }
+
+        /* Badges de estado */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .badge-active   { background: #cfe8d5; color: #1e5b2a; }
+        .badge-returned { background: #d6d6d6; color: #555; }
+        .badge-overdue  { background: #f8d1d1; color: #a82020; }
+
+        /* Botón devolver */
+        .btn-return {
+            background: var(--detalle); color: white; border: none;
+            padding: 6px 14px; border-radius: 6px; cursor: pointer;
+            font-size: 13px; transition: background 0.2s;
+        }
+        .btn-return:hover { background: var(--vino); }
+        .btn-return:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .status-msg {
+            padding: 24px; text-align: center; color: #666;
+            font-style: italic;
+        }
+        .status-msg.error { color: #c0392b; }
+
+        /* Tarjeta de resumen */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+            max-width: 700px;
+        }
+        .summary-card {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(6px);
+            border-radius: 12px;
+            padding: 18px 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+        .summary-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            color: var(--vino);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .summary-label {
+            font-size: 12px;
+            color: var(--texto);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body class="has-app-nav">
+
+<script src="js/session.js"></script>
+<script> requireAuth(); </script>
+
+<div id="app-nav" data-page="prestamos"></div>
+
+<main>
+    <h1 class="titulo-seccion">Mis Préstamos</h1>
+
+    <!-- Tarjetas de resumen -->
+    <div class="summary-cards">
+        <div class="summary-card">
+            <div class="summary-number" id="countActive">0</div>
+            <div class="summary-label">Activos</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-number" id="countOverdue">0</div>
+            <div class="summary-label">Vencidos</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-number" id="countReturned">0</div>
+            <div class="summary-label">Devueltos</div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters">
+        <button class="filter-btn active" data-filter="all">Todos</button>
+        <button class="filter-btn" data-filter="ACTIVE">Activos</button>
+        <button class="filter-btn" data-filter="OVERDUE">Vencidos</button>
+        <button class="filter-btn" data-filter="RETURNED">Devueltos</button>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Fecha de Préstamo</th>
+                    <th>Fecha Límite</th>
+                    <th>Fecha de Devolución</th>
+                    <th>Estatus</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="loansTable">
+                <tr><td colspan="7" class="status-msg">Cargando préstamos...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer>© 2026 Biblioteca "Alfonso Reyes"</footer>
+
+<script src="js/nav.js"></script>
+<script>
+let allLoans = [];
+let currentFilter = "all";
+
+// Formatea una fecha ISO -> DD/MM/YYYY
+function fmtDate(iso) {
+    if (!iso) return "—";
+    const d = new Date(iso);
+    return d.toLocaleDateString("es-MX", {
+        day: "2-digit", month: "2-digit", year: "numeric"
+    });
+}
+
+// Determina el estado "real" de un préstamo (ACTIVE puede ser OVERDUE si pasó dueDate)
+function realStatus(loan) {
+    if (loan.status === "RETURNED") return "RETURNED";
+    if (loan.dueDate && new Date(loan.dueDate) < new Date()) return "OVERDUE";
+    return "ACTIVE";
+}
+
+function renderLoans() {
+    const tbody = document.getElementById("loansTable");
+
+    const filtered = currentFilter === "all"
+        ? allLoans
+        : allLoans.filter(l => realStatus(l) === currentFilter);
+
+    if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="7" class="status-msg">No hay préstamos en esta categoría.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = "";
+    filtered.forEach(loan => {
+        // Un préstamo puede tener varios libros (loanitem), creamos una fila por libro
+        loan.loanitem.forEach(it => {
+            const status = realStatus(loan);
+            const badge = {
+                ACTIVE:   '<span class="badge badge-active">ACTIVO</span>',
+                OVERDUE:  '<span class="badge badge-overdue">VENCIDO</span>',
+                RETURNED: '<span class="badge badge-returned">DEVUELTO</span>',
+            }[status];
+
+            const canReturn = status === "ACTIVE" || status === "OVERDUE";
+            const actionBtn = canReturn
+                ? `<button class="btn-return" data-loan-id="${loan.id}">Devolver</button>`
+                : "—";
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${escapeHtml(it.book?.title ?? "—")}</td>
+                <td>${escapeHtml(it.book?.author ?? "—")}</td>
+                <td>${fmtDate(loan.loanDate)}</td>
+                <td>${fmtDate(loan.dueDate)}</td>
+                <td>${fmtDate(loan.returnDate)}</td>
+                <td>${badge}</td>
+                <td>${actionBtn}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    });
+
+    // Enganchar botones de devolver
+    tbody.querySelectorAll(".btn-return").forEach(btn => {
+        btn.addEventListener("click", () => handleReturn(btn.dataset.loanId, btn));
+    });
+}
+
+function escapeHtml(str) {
+    if (str == null) return "";
+    return String(str).replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+    }[c]));
+}
+
+function updateSummary() {
+    let active = 0, overdue = 0, returned = 0;
+    allLoans.forEach(l => {
+        const s = realStatus(l);
+        if (s === "ACTIVE")   active++;
+        if (s === "OVERDUE")  overdue++;
+        if (s === "RETURNED") returned++;
+    });
+    document.getElementById("countActive").textContent   = active;
+    document.getElementById("countOverdue").textContent  = overdue;
+    document.getElementById("countReturned").textContent = returned;
+}
+
+async function loadLoans() {
+    const user = getUser();
+    const tbody = document.getElementById("loansTable");
+    tbody.innerHTML = `<tr><td colspan="7" class="status-msg">Cargando...</td></tr>`;
+
+    try {
+        allLoans = await apiFetch(`/loans?userId=${user.id}`);
+        updateSummary();
+        renderLoans();
+    } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" class="status-msg error">${err.message}</td></tr>`;
+    }
+}
+
+async function handleReturn(loanId, btn) {
+    if (!confirm("¿Confirmas que quieres registrar la devolución de este préstamo?")) return;
+
+    btn.disabled = true;
+    btn.textContent = "Procesando...";
+
+    try {
+        const result = await apiFetch(`/loans/${loanId}/return`, { method: "PUT" });
+
+        // Si se generó una multa, avisar al usuario
+        if (result.fine && result.fine.length > 0) {
+            const fine = result.fine[result.fine.length - 1]; // la última
+            alert(`Devolución registrada. Se generó una multa de $${fine.amount} por atraso.`);
+        } else {
+            alert("Devolución registrada correctamente.");
+        }
+
+        await loadLoans();
+    } catch (err) {
+        alert("Error: " + err.message);
+        btn.disabled = false;
+        btn.textContent = "Devolver";
+    }
+}
+
+// Filtros
+document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentFilter = btn.dataset.filter;
+        renderLoans();
+    });
+});
+
+// Arranque
+loadLoans();
+</script>
+
+</body>
+</html>

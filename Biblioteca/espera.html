@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Listas de Espera - Biblioteca "Alfonso Reyes"</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/app.css">
+    <style>
+        .filters {
+            display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .filter-btn {
+            background: rgba(255,255,255,0.85); color: var(--vino);
+            border: none; padding: 8px 18px; border-radius: 20px;
+            cursor: pointer; font-size: 14px;
+            font-family: 'Libre Baskerville', serif;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover { background: white; }
+        .filter-btn.active { background: var(--vino); color: white; }
+
+        .badge {
+            display: inline-block; padding: 4px 10px; border-radius: 20px;
+            font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+        }
+        .badge-waiting   { background: #fff1c4; color: #8c6d00; }
+        .badge-notified  { background: #c4e4ff; color: #0055a8; }
+        .badge-cancelled { background: #d6d6d6; color: #555; }
+        .badge-fulfilled { background: #cfe8d5; color: #1e5b2a; }
+
+        .btn-cancel {
+            background: #c62828; color: white; border: none;
+            padding: 6px 14px; border-radius: 6px; cursor: pointer;
+            font-size: 13px; transition: opacity 0.2s;
+        }
+        .btn-cancel:hover { opacity: 0.85; }
+        .btn-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .status-msg {
+            padding: 24px; text-align: center; color: #666; font-style: italic;
+        }
+        .status-msg.error { color: #c0392b; }
+
+        .position-cell {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            color: var(--vino);
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .empty-state {
+            background: rgba(255,255,255,0.85);
+            border-radius: 15px; padding: 40px; text-align: center;
+            max-width: 600px; margin: 30px auto;
+        }
+        .empty-state h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--vino); margin-bottom: 10px;
+        }
+        .empty-state p { color: var(--texto); margin-bottom: 20px; }
+    </style>
+</head>
+<body class="has-app-nav">
+
+<script src="js/session.js"></script>
+<script> requireAuth(); </script>
+
+<div id="app-nav" data-page="espera"></div>
+
+<main>
+    <h1 class="titulo-seccion">Mis Listas de Espera</h1>
+    <p class="descripcion">
+        Estos son los libros que solicitaste cuando no había disponibilidad.
+        Cuando llegue tu turno, serás notificado.
+    </p>
+
+    <!-- Filtros -->
+    <div class="filters">
+        <button class="filter-btn active" data-filter="active">Activas</button>
+        <button class="filter-btn" data-filter="all">Todas</button>
+        <button class="filter-btn" data-filter="CANCELLED">Canceladas</button>
+        <button class="filter-btn" data-filter="FULFILLED">Cumplidas</button>
+    </div>
+
+    <!-- Tabla -->
+    <div id="tableWrapper">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Género</th>
+                        <th>Fecha Solicitud</th>
+                        <th style="text-align:center;">Posición</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="holdsTable">
+                    <tr><td colspan="7" class="status-msg">Cargando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" id="emptyState" style="display:none;">
+        <h3>No estás en ninguna lista de espera</h3>
+        <p>Cuando un libro no tenga copias disponibles, podrás anotarte en la fila desde la pantalla de libros.</p>
+        <a href="libros.html" class="btn-principal">Ver catálogo</a>
+    </div>
+</main>
+
+<footer>© 2026 Biblioteca "Alfonso Reyes"</footer>
+
+<script src="js/nav.js"></script>
+<script>
+let allHolds = [];
+let currentFilter = "active";
+
+function fmtDate(iso) {
+    if (!iso) return "—";
+    return new Date(iso).toLocaleDateString("es-MX", {
+        day: "2-digit", month: "2-digit", year: "numeric"
+    });
+}
+
+function escapeHtml(str) {
+    if (str == null) return "";
+    return String(str).replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+    }[c]));
+}
+
+function renderHolds() {
+    const tbody = document.getElementById("holdsTable");
+    const wrapper = document.getElementById("tableWrapper");
+    const empty = document.getElementById("emptyState");
+
+    let filtered;
+    if (currentFilter === "active") {
+        filtered = allHolds.filter(h => h.status === "WAITING" || h.status === "NOTIFIED");
+    } else if (currentFilter === "all") {
+        filtered = allHolds;
+    } else {
+        filtered = allHolds.filter(h => h.status === currentFilter);
+    }
+
+    // Si no hay nada y estamos en "activas", mostrar empty state
+    if (!filtered.length && currentFilter === "active" && !allHolds.length) {
+        wrapper.style.display = "none";
+        empty.style.display = "block";
+        return;
+    }
+    wrapper.style.display = "";
+    empty.style.display = "none";
+
+    if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="7" class="status-msg">No hay registros en esta categoría.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = "";
+    filtered.forEach(hold => {
+        const badges = {
+            WAITING:   '<span class="badge badge-waiting">EN ESPERA</span>',
+            NOTIFIED:  '<span class="badge badge-notified">TU TURNO</span>',
+            CANCELLED: '<span class="badge badge-cancelled">CANCELADA</span>',
+            FULFILLED: '<span class="badge badge-fulfilled">CUMPLIDA</span>',
+        };
+
+        const canCancel = hold.status === "WAITING" || hold.status === "NOTIFIED";
+        const action = canCancel
+            ? `<button class="btn-cancel" data-hold-id="${hold.id}">Cancelar</button>`
+            : "—";
+
+        const positionCell = hold.status === "WAITING"
+            ? `<div class="position-cell">#${hold.position}</div>`
+            : "—";
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${escapeHtml(hold.book?.title ?? "—")}</td>
+            <td>${escapeHtml(hold.book?.author ?? "—")}</td>
+            <td>${escapeHtml(hold.book?.genre ?? "—")}</td>
+            <td>${fmtDate(hold.createdAt)}</td>
+            <td>${positionCell}</td>
+            <td>${badges[hold.status] ?? hold.status}</td>
+            <td>${action}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    // Enganchar cancelar
+    tbody.querySelectorAll(".btn-cancel").forEach(btn => {
+        btn.addEventListener("click", () => handleCancel(btn.dataset.holdId, btn));
+    });
+}
+
+async function loadHolds() {
+    const user = getUser();
+    const tbody = document.getElementById("holdsTable");
+    tbody.innerHTML = `<tr><td colspan="7" class="status-msg">Cargando...</td></tr>`;
+
+    try {
+        allHolds = await apiFetch(`/holds?userId=${user.id}`);
+        renderHolds();
+    } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" class="status-msg error">${err.message}</td></tr>`;
+    }
+}
+
+async function handleCancel(holdId, btn) {
+    if (!confirm("¿Seguro que quieres cancelar esta solicitud?")) return;
+
+    btn.disabled = true;
+    btn.textContent = "Cancelando...";
+
+    try {
+        await apiFetch(`/holds/${holdId}`, { method: "DELETE" });
+        await loadHolds();
+    } catch (err) {
+        alert("Error: " + err.message);
+        btn.disabled = false;
+        btn.textContent = "Cancelar";
+    }
+}
+
+// Filtros
+document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentFilter = btn.dataset.filter;
+        renderHolds();
+    });
+});
+
+loadHolds();
+</script>
+
+</body>
+</html>

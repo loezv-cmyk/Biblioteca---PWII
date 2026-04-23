@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reportes | Biblioteca "Alfonso Reyes"</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/app.css">
+    <!-- Chart.js para las gráficas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        /* === LAYOUT GENERAL === */
+        .reports-wrapper { max-width: 1200px; margin: 0 auto; }
+
+        /* === KPI CARDS (DASHBOARD) === */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+        .kpi-card {
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(6px);
+            border-radius: 14px;
+            padding: 22px 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            border-left: 4px solid var(--vino);
+            transition: transform 0.2s;
+        }
+        .kpi-card:hover { transform: translateY(-3px); }
+        .kpi-card.danger  { border-left-color: #d9534f; }
+        .kpi-card.warning { border-left-color: #f0ad4e; }
+        .kpi-card.success { border-left-color: #2e7d32; }
+        .kpi-card.info    { border-left-color: var(--fondo1); }
+
+        .kpi-label {
+            font-size: 11px;
+            color: var(--texto);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+        .kpi-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            color: var(--vino);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .kpi-sub {
+            font-size: 12px;
+            color: var(--texto);
+            opacity: 0.7;
+        }
+
+        /* === SECCIONES === */
+        .report-section {
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(6px);
+            border-radius: 14px;
+            padding: 26px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        .report-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            color: var(--vino);
+            margin-bottom: 6px;
+        }
+        .report-subtitle {
+            font-size: 13px;
+            color: var(--texto);
+            opacity: 0.75;
+            margin-bottom: 20px;
+        }
+
+        /* Layout de 2 columnas para gráficas + tablas */
+        .report-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 900px) {
+            .report-row { grid-template-columns: 1fr; }
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* === TABLAS MÁS COMPACTAS === */
+        .report-section table {
+            font-size: 14px;
+        }
+        .report-section th, .report-section td {
+            padding: 10px 14px;
+        }
+
+        /* === ESTADO DE CARGA === */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--texto);
+            font-style: italic;
+        }
+
+        /* === BOTÓN REFRESH === */
+        .refresh-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .btn-refresh {
+            background: var(--vino);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: 'Libre Baskerville', serif;
+            transition: background 0.2s;
+        }
+        .btn-refresh:hover { background: var(--detalle); }
+        .btn-refresh:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .last-updated {
+            font-size: 12px;
+            color: rgba(255,255,255,0.85);
+        }
+
+        /* === BADGES PARA REPORTES === */
+        .mini-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .mini-badge.overdue { background: #f8d1d1; color: #a82020; }
+        .mini-badge.danger  { background: #f8d1d1; color: #a82020; }
+    </style>
+</head>
+<body class="has-app-nav">
+
+<script src="../js/session.js"></script>
+<script> requireAdmin(); </script>
+
+<div id="app-nav" data-page="admin-reportes"></div>
+
+<main>
+    <div class="reports-wrapper">
+        <h1 class="titulo-seccion">Panel de Reportes</h1>
+
+        <div class="refresh-bar">
+            <span class="last-updated" id="lastUpdated">—</span>
+            <button class="btn-refresh" id="btnRefresh">🔄 Actualizar datos</button>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- REPORTE 1: DASHBOARD GENERAL (KPIs)          -->
+        <!-- ============================================ -->
+        <div class="report-section">
+            <h2 class="report-title">📊 Resumen general del sistema</h2>
+            <p class="report-subtitle">
+                Indicadores clave cruzando usuarios, libros, préstamos, listas de espera y multas.
+            </p>
+
+            <div id="kpiContainer">
+                <div class="loading">Cargando indicadores...</div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- REPORTE 2: LIBROS MÁS PRESTADOS              -->
+        <!-- ============================================ -->
+        <div class="report-section">
+            <h2 class="report-title">📚 Libros más prestados</h2>
+            <p class="report-subtitle">
+                Top 10 títulos con mayor demanda histórica. Cruza <strong>loanitem + book</strong>.
+            </p>
+
+            <div class="report-row">
+                <div>
+                    <div class="chart-container">
+                        <canvas id="chartMostBorrowed"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Título</th>
+                                    <th>Autor</th>
+                                    <th>Préstamos</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblMostBorrowed">
+                                <tr><td colspan="4" class="loading">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- REPORTE 3: USUARIOS CON MÁS MULTAS           -->
+        <!-- ============================================ -->
+        <div class="report-section">
+            <h2 class="report-title">⚠️ Usuarios con más multas</h2>
+            <p class="report-subtitle">
+                Ranking de usuarios problemáticos. Cruza <strong>fine + user</strong>.
+            </p>
+
+            <div class="report-row">
+                <div>
+                    <div class="chart-container">
+                        <canvas id="chartFinedUsers"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Usuario</th>
+                                    <th>Multas</th>
+                                    <th>Monto total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblFinedUsers">
+                                <tr><td colspan="4" class="loading">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- REPORTE 4: PRÉSTAMOS VENCIDOS                 -->
+        <!-- ============================================ -->
+        <div class="report-section">
+            <h2 class="report-title">⏰ Préstamos vencidos</h2>
+            <p class="report-subtitle">
+                Préstamos que no se han devuelto y pasaron de la fecha límite.
+                Cruza <strong>loan + user + loanitem + book</strong>.
+            </p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Usuario</th>
+                            <th>Libros</th>
+                            <th>Fecha préstamo</th>
+                            <th>Fecha límite</th>
+                            <th>Días de atraso</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblOverdue">
+                        <tr><td colspan="6" class="loading">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<footer>© 2026 Biblioteca "Alfonso Reyes"</footer>
+
+<script src="../js/nav.js"></script>
+<script>
+// ==== Paleta del proyecto para las gráficas ====
+const COLORS = {
+    vino:    "#470B24",
+    detalle: "#974472",
+    fondo1:  "#4f8a94",
+    fondo2:  "#9ea6c4",
+    texto:   "#553832",
+};
+
+const CHART_PALETTE = [
+    COLORS.vino, COLORS.detalle, COLORS.fondo1, COLORS.fondo2,
+    "#8e44ad", "#e67e22", "#16a085", "#c0392b", "#2980b9", "#27ae60",
+];
+
+// ==== Charts (referencias para destruirlos y recrearlos en refresh) ====
+let chartMostBorrowed = null;
+let chartFinedUsers = null;
+
+// ==== Helpers ====
+function fmtDate(iso) {
+    if (!iso) return "—";
+    return new Date(iso).toLocaleDateString("es-MX", {
+        day: "2-digit", month: "2-digit", year: "numeric"
+    });
+}
+function fmtMoney(n) {
+    return "$" + Number(n).toFixed(2);
+}
+function escapeHtml(str) {
+    if (str == null) return "";
+    return String(str).replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+    }[c]));
+}
+
+// ============================================
+// REPORTE 1 — Dashboard KPIs
+// ============================================
+async function loadDashboard() {
+    const container = document.getElementById("kpiContainer");
+    try {
+        const res = await apiFetch("/reports/dashboard");
+        const d = res.data;
+
+        container.innerHTML = `
+            <div class="kpi-grid">
+                <div class="kpi-card info">
+                    <div class="kpi-label">Miembros</div>
+                    <div class="kpi-value">${d.usuarios.miembros}</div>
+                    <div class="kpi-sub">${d.usuarios.administradores} administradores</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-label">Títulos</div>
+                    <div class="kpi-value">${d.libros.titulos}</div>
+                    <div class="kpi-sub">${d.libros.copiasTotales} copias totales</div>
+                </div>
+
+                <div class="kpi-card success">
+                    <div class="kpi-label">Préstamos activos</div>
+                    <div class="kpi-value">${d.prestamos.activos}</div>
+                    <div class="kpi-sub">${d.prestamos.devueltos} devueltos</div>
+                </div>
+
+                <div class="kpi-card danger">
+                    <div class="kpi-label">Préstamos vencidos</div>
+                    <div class="kpi-value">${d.prestamos.vencidos}</div>
+                    <div class="kpi-sub">requieren atención</div>
+                </div>
+
+                <div class="kpi-card warning">
+                    <div class="kpi-label">Multas pendientes</div>
+                    <div class="kpi-value">${d.multas.pendientes}</div>
+                    <div class="kpi-sub">${fmtMoney(d.multas.montoPendiente)} por cobrar</div>
+                </div>
+
+                <div class="kpi-card success">
+                    <div class="kpi-label">Multas pagadas</div>
+                    <div class="kpi-value">${d.multas.pagadas}</div>
+                    <div class="kpi-sub">históricas</div>
+                </div>
+
+                <div class="kpi-card info">
+                    <div class="kpi-label">Listas de espera</div>
+                    <div class="kpi-value">${d.listaEspera.activas}</div>
+                    <div class="kpi-sub">activas</div>
+                </div>
+            </div>
+        `;
+    } catch (err) {
+        container.innerHTML = `<div class="loading" style="color:#c0392b;">Error: ${err.message}</div>`;
+    }
+}
+
+// ============================================
+// REPORTE 2 — Libros más prestados
+// ============================================
+async function loadMostBorrowed() {
+    const tbody = document.getElementById("tblMostBorrowed");
+    try {
+        const res = await apiFetch("/reports/most-borrowed-books?limit=10");
+        const data = res.data;
+
+        if (!data.length) {
+            tbody.innerHTML = `<tr><td colspan="4" class="loading">Sin datos aún.</td></tr>`;
+            return;
+        }
+
+        // Tabla
+        tbody.innerHTML = "";
+        data.forEach((row, i) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td style="font-weight:700; color:var(--vino);">${i + 1}</td>
+                <td>${escapeHtml(row.title)}</td>
+                <td>${escapeHtml(row.author)}</td>
+                <td style="font-weight:700;">${row.totalLoans}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Gráfica de barras
+        if (chartMostBorrowed) chartMostBorrowed.destroy();
+        chartMostBorrowed = new Chart(document.getElementById("chartMostBorrowed"), {
+            type: "bar",
+            data: {
+                labels: data.map(r => r.title.length > 25 ? r.title.slice(0, 22) + "…" : r.title),
+                datasets: [{
+                    label: "Préstamos",
+                    data: data.map(r => r.totalLoans),
+                    backgroundColor: CHART_PALETTE[0],
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                indexAxis: "y",
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+    } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="4" class="loading" style="color:#c0392b;">Error: ${err.message}</td></tr>`;
+    }
+}
+
+// ============================================
+// REPORTE 3 — Usuarios con más multas
+// ============================================
+async function loadFinedUsers() {
+    const tbody = document.getElementById("tblFinedUsers");
+    try {
+        const res = await apiFetch("/reports/users-with-most-fines");
+        const data = res.data;
+
+        if (!data.length) {
+            tbody.innerHTML = `<tr><td colspan="4" class="loading">No hay multas registradas.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = "";
+        data.forEach((row, i) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td style="font-weight:700; color:var(--vino);">${i + 1}</td>
+                <td>${escapeHtml(row.name)}</td>
+                <td>${row.totalFines}</td>
+                <td style="font-weight:700;">${fmtMoney(row.totalAmount)}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Gráfica tipo dona
+        if (chartFinedUsers) chartFinedUsers.destroy();
+        chartFinedUsers = new Chart(document.getElementById("chartFinedUsers"), {
+            type: "doughnut",
+            data: {
+                labels: data.map(r => r.name),
+                datasets: [{
+                    data: data.map(r => r.totalAmount),
+                    backgroundColor: CHART_PALETTE,
+                    borderWidth: 2,
+                    borderColor: "#fff",
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: "right", labels: { boxWidth: 12, font: { size: 11 } } },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => `${ctx.label}: ${fmtMoney(ctx.parsed)}`
+                        }
+                    }
+                }
+            }
+        });
+    } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="4" class="loading" style="color:#c0392b;">Error: ${err.message}</td></tr>`;
+    }
+}
+
+// ============================================
+// REPORTE 4 — Préstamos vencidos
+// ============================================
+async function loadOverdue() {
+    const tbody = document.getElementById("tblOverdue");
+    try {
+        const res = await apiFetch("/reports/overdue-loans");
+        const data = res.data;
+
+        if (!data.length) {
+            tbody.innerHTML = `<tr><td colspan="6" class="loading">No hay préstamos vencidos 🎉</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = "";
+        data.forEach(row => {
+            const booksList = (row.books || []).map(b =>
+                `${escapeHtml(b.title)} (x${b.qty})`
+            ).join(", ");
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>#${row.loanId}</td>
+                <td>${escapeHtml(row.user?.name ?? "—")}</td>
+                <td style="font-size:13px;">${booksList || "—"}</td>
+                <td>${fmtDate(row.loanDate)}</td>
+                <td>${fmtDate(row.dueDate)}</td>
+                <td><span class="mini-badge danger">${row.daysOverdue} día(s)</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" class="loading" style="color:#c0392b;">Error: ${err.message}</td></tr>`;
+    }
+}
+
+// ============================================
+// Carga todo — con guard anti-bucle
+// ============================================
+let isLoading = false;
+
+async function loadAll() {
+    if (isLoading) return; // evita llamadas simultáneas
+    isLoading = true;
+
+    const btn = document.getElementById("btnRefresh");
+    btn.disabled = true;
+    btn.textContent = "Cargando...";
+
+    try {
+        await Promise.all([
+            loadDashboard(),
+            loadMostBorrowed(),
+            loadFinedUsers(),
+            loadOverdue(),
+        ]);
+
+        const now = new Date().toLocaleString("es-MX");
+        document.getElementById("lastUpdated").textContent = `Última actualización: ${now}`;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = "🔄 Actualizar datos";
+        isLoading = false; // siempre se libera, incluso si hubo error
+    }
+}
+
+document.getElementById("btnRefresh").addEventListener("click", loadAll);
+
+loadAll();
+</script>
+
+</body>
+</html>
